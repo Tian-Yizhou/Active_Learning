@@ -11,7 +11,7 @@ A measured library contains $M$ protein variants, each with values for $j$ exper
 Formally, we learn a conditional distribution over target sequences
 
 $$
-p_\theta\!\left(X_2 \mid X_1, d\right), \qquad d \in \{0,1,2\}^j,
+p_\theta\left(X_2 \mid X_1, d\right), \qquad d \in \{0,1,2\}^j,
 $$
 
 where $X_1$ is the seed, $X_2$ the proposed mutant, and $d$ an ordered vector of discrete directional intents. The model operates not on tokens but on the continuous residue embeddings of a frozen protein language model.
@@ -105,7 +105,7 @@ Both a cosine and a linear $\beta$ schedule are available; cosine is the default
 The network predicts the clean target directly:
 
 $$
-\hat z_0^{(2)}=\hat z_\theta\!\left(z_t^{(2)},t,z^{(1)},d\right).
+\hat z_0^{(2)}=\hat z_\theta\left(z_t^{(2)},t,z^{(1)},d\right).
 $$
 
 One training step, with the frozen encoder $E$ and the trainable denoiser $\hat z_\theta$:
@@ -128,7 +128,7 @@ target X2 ──► E ──► z2_0 ──► add noise at step t ──► z2_
 Concatenate the noisy target and the clean seed along the **feature axis**, then project back to width $D$:
 
 $$
-h_0=P\!\left(\left[z_t^{(2)};z^{(1)}\right]_{\text{features}}\right),
+h_0=P\left(\left[z_t^{(2)};z^{(1)}\right]_{\text{features}}\right),
 \qquad \mathbb{R}^{L\times 2D}\xrightarrow{\;P\;}\mathbb{R}^{L\times D}.
 $$
 
@@ -149,7 +149,7 @@ Preserving objective identity matters: $[2,0]$ and $[0,2]$ must not collide, whi
 The condition enters pretrained ESM-2 attention blocks by modulating their pre-norms:
 
 $$
-\operatorname{AdaLN}(h,c)=\gamma(c)\odot\operatorname{LayerNorm}(h)+\beta(c),
+\mathrm{AdaLN}(h,c)=\gamma(c)\odot\mathrm{LayerNorm}(h)+\beta(c),
 $$
 
 with $\gamma$ and $\beta$ broadcast across residue positions. Here $\beta(c)$ is the conditioning shift — distinct from the diffusion schedule $\beta_t$.
@@ -167,7 +167,7 @@ Use **$x_0$-prediction with mean squared error**:
 
 $$
 \mathcal L=\mathbb E_{(X_1,X_2,d),\,t,\,\epsilon}
-\left[\left\|\hat z_\theta\!\left(z_t^{(2)},t,z^{(1)},d\right)-z_0^{(2)}\right\|_2^2\right].
+\left[\left\|\hat z_\theta\left(z_t^{(2)},t,z^{(1)},d\right)-z_0^{(2)}\right\|_2^2\right].
 $$
 
 In a padded batch the squared error is reduced over valid residue positions and hidden features only, then averaged per sample, so sequences of different lengths contribute comparably and padding cannot influence the gradient.
@@ -211,8 +211,8 @@ Partial noising is a **soft** control on exploration. It does not bound the numb
 The predicted clean latent is decoded with the frozen head:
 
 $$
-\ell=\operatorname{lm\_head}\!\left(\hat z_0^{(2)}\right)\in\mathbb{R}^{L\times|\mathcal V|},
-\qquad \hat X_2=\operatorname{Decode}(\ell).
+\ell=\mathrm{lm\_head}\left(\hat z_0^{(2)}\right)\in\mathbb{R}^{L\times|\mathcal V|},
+\qquad \hat X_2=\mathrm{Decode}(\ell).
 $$
 
 The decoding policy is **argmax restricted to the 20 canonical amino acids**: special tokens are excluded from the logit selection rather than filtered after the fact, so no special token can ever appear as a residue. Temperature or top-$k$ sampling over residues is a documented extension point, not current behavior.
