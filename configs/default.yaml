@@ -1,0 +1,35 @@
+# Paths are resolved relative to the working directory; run from the project root.
+seed: 42
+model:
+  name: facebook/esm2_t6_8M_UR50D
+  revision: main                # Pin a Hub commit for reproducible research runs.
+  local_files_only: false
+  num_layers: null              # null: copy every pretrained ESM-2 block
+data:
+  csv_path: null                # null: use synthetic data; otherwise id,sequence,<objectives>
+  objective_names: [fitness_1, fitness_2]
+  num_objectives: 2
+  tau: [0.05, 0.05]
+  val_fraction: 0.2
+  bidirectional: true
+  synthetic_size: 40
+  sequence_length: 32
+diffusion:
+  timesteps: 1000               # clean state t=0; noisy states t=1,...,T
+  noise_schedule: cosine       # cosine or linear
+  p_uncond: 0.1                 # drop all objective directions, keep the seed
+training:
+  batch_size: 8
+  epochs: 10
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  gradient_clip: 1.0
+  num_workers: 0
+  mixed_precision: "no"        # no, fp16, or bf16
+  output_dir: runs/default
+  checkpoint_every: 1
+sampling:
+  steps: 50
+  guidance_scale: 2.0           # 1 = ordinary conditional, 0 = null directions
+  eta: 0.0                     # deterministic DDIM given initial noise
+  t_start: null                # null: full noise; integer 0<t_start<T: SDEdit
