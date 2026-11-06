@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "directional-protein-diffusion"
+version = "0.1.0"
+description = "Conditional ESM-2 latent diffusion for multi-objective protein optimization"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+    "torch>=2.6,<3",
+    "transformers>=4.44,<5",
+    "accelerate>=1,<2",
+    "PyYAML>=6,<7",
+    "numpy>=1.26,<3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.9"]
+
+[project.scripts]
+protdiff = "directional_protein_diffusion.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["directional_protein_diffusion*"]
+
+[tool.setuptools.package-data]
+directional_protein_diffusion = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = [".conda-env"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["directional_protein_diffusion"]
